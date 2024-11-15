@@ -18,19 +18,6 @@ try {
 m = smsg(this, m) || m
 if (!m)
 return
-function saveMessage(msg) {
-if (!msg.message) return
-const messageData = {
-id: msg.key.id,
-messageInfo: {
-key: msg.key,
-message: msg.message,
-messageTimestamp: msg.messageTimestamp,
-pushName: msg.pushName
-}}
-fs.appendFile('messages.jsonl', JSON.stringify(messageData) + '\n', (err) => {
-if (err) {} }) }
-saveMessage(m)
 if (typeof m.text !== 'string') m.text = ''
 let usedPrefix = '.'
 for (let name in global.plugins) {
@@ -71,16 +58,14 @@ const caption = `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\
 *┃ ViewOnce (eliminado)*
 - *Nombre:* @${participant.split`@`[0]}
 ${msg.chat.endsWith('@g.us') ? `- *Grupo:* ${await conn.getName(msg.chat)}` : '- *Chat privado*'}
-${msgg[type].caption ? `- *Texto:* ${msgg[type].caption}` : '- *Texto:* _sin_texto_'}
-ID: ${id}`
+${msgg[type].caption ? `- *Texto:* ${msgg[type].caption}` : '- *Texto:* _sin_texto_'}`
 return await conn.sendFile(conn.user.jid, buffer, null, caption, null, null, { mentions: conn.parseMention(caption), quoted: msg })
 } else if (/audio/.test(type)) {
 await conn.reply(conn.user.jid, `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
 *┃ ViewOnce (eliminado)*
 - *Nombre:* @${participant.split`@`[0]}
 ${msg.chat.endsWith('@g.us') ? `- *Grupo:* ${await conn.getName(msg.chat)}` : '- *Chat privado*'}
-- *Tipo:* Nota de voz🔊
-ID: ${id}`, m, { mentions: [participant], quoted: msg })
+- *Tipo:* Nota de voz🔊`, m, { mentions: [participant], quoted: msg })
 await conn.sendMessage(conn.user.jid, { audio: buffer, ptt: true }, { quoted: msg })
 }}
 let isImageOrVideo = msg.mtype === 'imageMessage' || msg.mtype === 'videoMessage'
@@ -89,15 +74,13 @@ const deleteMsg = `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼�
 *┃ Nombre:* @${participant.split`@`[0]}
 ${msg.chat.endsWith('@g.us') ? `*┃ Grupo:* ${await conn.getName(msg.chat)}` : '*┃ Chat privado*'}
 - *📝Mensaje:* ${msg.text}
-*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
-ID: ${id}`
+*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*`
 await this.sendMessage(conn.user.jid, { text: deleteMsg, mentions: conn.parseMention(deleteMsg) }, { quoted: msg })
 } else if (isImageOrVideo) {
 const iOV = `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
 *┃ Nombre:* @${participant.split`@`[0]}
 ${msg.chat.endsWith('@g.us') ? `*┃ Grupo:* ${await conn.getName(msg.chat)}` : '*┃ Chat privado*'}
-${msg.text ? `- *Texto:* ${msg.text}` : '- *Texto:* _sin_texto_'}
-ID: ${id}`
+${msg.text ? `- *Texto:* ${msg.text}` : '- *Texto:* _sin_texto_'}`
 let img = await msg.download?.()
 await conn.sendFile(conn.user.jid, img, null, iOV, null, null, { mentions: conn.parseMention(iOV), quoted: msg })
 } else if (msg.mtype === 'stickerMessage') {
@@ -105,15 +88,13 @@ await conn.sendMessage(conn.user.jid, { text: `*━━━ \`𝘼𝙉𝙏𝙄 �
 *┃ Nombre:* @${participant.split`@`[0]}
 ${msg.chat.endsWith('@g.us') ? `*┃ Grupo:* ${await conn.getName(msg.chat)}` : '*┃ Chat privado*'}
 *┃ Reenviando sticker..*
-*━━━ 👇🏻👇🏻👇🏻👇🏻👇🏻 ━━━*
-ID: ${id}`, mentions: [participant] }, { quoted: msg })
+*━━━ 👇🏻👇🏻👇🏻👇🏻👇🏻 ━━━*`, mentions: [participant] }, { quoted: msg })
 this.copyNForward(conn.user.jid, msg)
 } else if (!isOnce) {
 await conn.sendMessage(conn.user.jid, { text: `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
 *┃ Nombre:* @${participant.split`@`[0]}
 ${msg.chat.endsWith('@g.us') ? `*┃ Grupo:* ${await conn.getName(msg.chat)}` : '*┃ Chat privado*'}
 *┃ Reenviando contenido borrado..*
-*━━━ 👇🏻👇🏻👇🏻👇🏻👇🏻 ━━━*
-ID: ${id}`, mentions: [participant] }, { quoted: msg })
+*━━━ 👇🏻👇🏻👇🏻👇🏻👇🏻 ━━━*`, mentions: [participant] }, { quoted: msg })
 this.copyNForward(conn.user.jid, msg)
 }}
