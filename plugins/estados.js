@@ -8,30 +8,26 @@ if (!media) return
 let caption = `━━━━ \`ESTADO\` ━━━━
 - *Contacto:* @${m.key.participant.split`@`[0]}
 ${imageMessage.caption ? `- *Texto:* ${imageMessage.caption}` : `- *Texto:* _sin_texto_`}
-━━━━ \`ESTADO\` ━━━━
-ID: ${m.key.id}`
+━━━━ \`ESTADO\` ━━━━`
 await conn.sendFile(conn.user.jid, media, null, caption, null, null, { mentions: conn.parseMention(caption), quoted: m })
 } else if (videoMessage) {
 let media = await m.download?.()
 let caption = `━━━━ \`ESTADO\` ━━━━
 - *Contacto:* @${m.key.participant.split`@`[0]}
 ${videoMessage.caption ? `- *Texto:* ${videoMessage.caption}` : `- *Texto:* _sin_texto_`}
-━━━━ \`ESTADO\` ━━━━
-ID: ${m.key.id}`
+━━━━ \`ESTADO\` ━━━━`
 await conn.sendFile(conn.user.jid, media, null, caption, null, null, { mentions: conn.parseMention(caption), quoted: m })
 } else if (audioMessage) {
 let media = await m.download?.()
 let caption = `━━━━ \`ESTADO AUDIO\` ━━━━
-- *Contacto:* @${m.key.participant.split`@`[0]}
-ID: ${m.key.id}`
+- *Contacto:* @${m.key.participant.split`@`[0]}`
 await conn.sendMessage(conn.user.jid, { text: caption, mentions: conn.parseMention(caption) }, { quoted: m })
 await conn.sendMessage(conn.user.jid, { audio: media, ptt: true }, { quoted: m })
 } else if (extendedTextMessage) {
 let caption = `━━━━ \`ESTADO\` ━━━━
 - *Contacto:* @${m.key.participant.split`@`[0]}
 - *Texto:* ${extendedTextMessage.text}
-━━━━ \`ESTADO\` ━━━━
-ID: ${m.key.id}`
+━━━━ \`ESTADO\` ━━━━`
 await conn.sendMessage(conn.user.jid, { text: caption, mentions: conn.parseMention(caption) }, { quoted: m })
 } else return
 }
