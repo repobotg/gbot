@@ -1,5 +1,4 @@
 const { proto } = (await import('@whiskeysockets/baileys')).default
-import fs from 'fs'
 export async function handler(chatUpdate) {
 if (!chatUpdate) {
 return
