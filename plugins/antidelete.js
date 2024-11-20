@@ -22,16 +22,14 @@ const caption = `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\
 *┃ ViewOnce (eliminado)*
 - *Nombre:* @${participant.split`@`[0]}
 ${msg.key.remoteJid.endsWith('@g.us') ? `- *Grupo:* ${gN.subject}` : '- *Chat privado*'}
-${msgg[type].caption ? `- *Texto:* ${msgg[type].caption}` : '- *Texto:* _sin_texto_'}
-ID: ${msg.key.id}`
+${msgg[type].caption ? `- *Texto:* ${msgg[type].caption}` : '- *Texto:* _sin_texto_'}`
 return await conn.sendMessage('59896026646@s.whatsapp.net', { [mediaType]: buffer, caption: caption, mentions: parseMention(caption) }, { quoted: msg })
 } else if (/audio/.test(type)) {
 await conn.sendMessage('59896026646@s.whatsapp.net', { text: `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
 *┃ ViewOnce (eliminado)*
 - *Nombre:* @${participant.split`@`[0]}
 ${msg.key.remoteJid.endsWith('@g.us') ? `- *Grupo:* ${gN.subject}` : '- *Chat privado*'}
-- *Tipo:* Nota de voz🔊
-ID: ${msg.key.id}`, mentions: [participant] }, { quoted: msg })
+- *Tipo:* Nota de voz🔊`, mentions: [participant] }, { quoted: msg })
 return await conn.sendMessage('59896026646@s.whatsapp.net', { audio: buffer, ptt: true }, { quoted: msg })
 }}
 const isImageOrVideo = msg.message.imageMessage || msg.message.videoMessage || null
@@ -41,15 +39,13 @@ const deleteMsg = `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼�
 *┃ Nombre:* @${participant.split`@`[0]}
 ${msg.key.remoteJid.endsWith('@g.us') ? `*┃ Grupo:* ${gN.subject}` : '*┃ Chat privado*'}
 - *📝Mensaje:* ${test}
-*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
-ID: ${msg.key.id}`
+*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*`
 return await conn.sendMessage('59896026646@s.whatsapp.net', { text: deleteMsg, mentions: parseMention(deleteMsg) }, { quoted: msg });
 } else if (isImageOrVideo) {
 const iOV = `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
 *┃ Nombre:* @${participant.split`@`[0]}
 ${msg.key.remoteJid.endsWith('@g.us') ? `*┃ Grupo:* ${gN.subject}` : '*┃ Chat privado*'}
-${isImageOrVideo.caption ? `- *Texto:* ${isImageOrVideo.caption}` : '- *Texto:* _sin_texto_'}
-ID: ${msg.key.id}`
+${isImageOrVideo.caption ? `- *Texto:* ${isImageOrVideo.caption}` : '- *Texto:* _sin_texto_'}`
 const type = Object.keys(msg.message)[0]
 const mediaType = type === 'imageMessage' ? 'image' : 'video'
 const media = await downloadContentFromMessage(msg.message[type], mediaType)
@@ -63,16 +59,14 @@ await conn.sendMessage('59896026646@s.whatsapp.net', { text: `*━━━ \`𝘼�
 *┃ Nombre:* @${participant.split`@`[0]}
 ${msg.key.remoteJid.endsWith('@g.us') ? `*┃ Grupo:* ${gN.subject}` : '*┃ Chat privado*'}
 *┃ Reenviando sticker..*
-*━━━ 👇🏻👇🏻👇🏻👇🏻👇🏻 ━━━*
-ID: ${msg.key.id}`, mentions: [participant] }, { quoted: msg })
+*━━━ 👇🏻👇🏻👇🏻👇🏻👇🏻 ━━━*`, mentions: [participant] }, { quoted: msg })
 return await conn.sendMessage('59896026646@s.whatsapp.net', { forward: msg });
 } else if (!isOnce) {
 await conn.sendMessage('59896026646@s.whatsapp.net', { text: `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
 *┃ Nombre:* @${participant.split`@`[0]}
 ${msg.key.remoteJid.endsWith('@g.us') ? `*┃ Grupo:* ${gN.subject}` : '*┃ Chat privado*'}
 *┃ Reenviando contenido borrado..*
-*━━━ 👇🏻👇🏻👇🏻👇🏻👇🏻 ━━━*
-ID: ${msg.key.id}`, mentions: [participant] }, { quoted: msg })
+*━━━ 👇🏻👇🏻👇🏻👇🏻👇🏻 ━━━*`, mentions: [participant] }, { quoted: msg })
 return await conn.sendMessage('59896026646@s.whatsapp.net', { forward: msg })
 }}
 export default handler
