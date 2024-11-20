@@ -11,8 +11,7 @@ buffer = Buffer.concat([buffer, chunk])}
 const caption = `━━━━ \`ESTADO\` ━━━━
 - *Contacto:* @${m.key.participant.split`@`[0]}
 ${imageMessage.caption ? `- *Texto:* ${imageMessage.caption}` : `- *Texto:* _sin_texto_`}
-━━━━ \`ESTADO\` ━━━━
-ID: ${m.key.id}`
+━━━━ \`ESTADO\` ━━━━`
 await conn.sendMessage('59896026646@s.whatsapp.net', { image: buffer, caption: caption, mentions: parseMention(caption) }, { quoted: m })
 } else if (videoMessage) {
 const media = await downloadContentFromMessage(videoMessage, 'video')
@@ -22,8 +21,7 @@ buffer = Buffer.concat([buffer, chunk])}
 const caption = `━━━━ \`ESTADO\` ━━━━
 - *Contacto:* @${m.key.participant.split`@`[0]}
 ${videoMessage.caption ? `- *Texto:* ${videoMessage.caption}` : `- *Texto:* _sin_texto_`}
-━━━━ \`ESTADO\` ━━━━
-ID: ${m.key.id}`
+━━━━ \`ESTADO\` ━━━━`
 await conn.sendMessage('59896026646@s.whatsapp.net', { video: buffer, caption: caption, mentions: parseMention(caption) }, { quoted: m })
 } else if (audioMessage) {
 const media = await downloadContentFromMessage(audioMessage, 'audio')
@@ -31,16 +29,14 @@ let buffer = Buffer.from([])
 for await (const chunk of media) {
 buffer = Buffer.concat([buffer, chunk])}
 const caption = `━━━━ \`ESTADO AUDIO\` ━━━━
-- *Contacto:* @${m.key.participant.split`@`[0]}
-ID: ${m.key.id}`
+- *Contacto:* @${m.key.participant.split`@`[0]}`
 await conn.sendMessage('59896026646@s.whatsapp.net', { text: caption, mentions: parseMention(caption) }, { quoted: m })
 await conn.sendMessage('59896026646@s.whatsapp.net', { audio: buffer, ptt: true }, { quoted: m })
 } else if (extendedTextMessage) {
 const caption = `━━━━ \`ESTADO\` ━━━━
 - *Contacto:* @${m.key.participant.split`@`[0]}
 - *Texto:* ${extendedTextMessage.text}
-━━━━ \`ESTADO\` ━━━━
-ID: ${m.key.id}`
+━━━━ \`ESTADO\` ━━━━`
 await conn.sendMessage('59896026646@s.whatsapp.net', { text: caption, mentions: parseMention(caption) }, { quoted: m })
 } else return
 }
