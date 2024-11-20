@@ -1,0 +1,9 @@
+{
+"type": "module",
+"dependencies": {
+"@whiskeysockets/baileys": "npm:@whiskeysockets/baileys@6.7.8",
+"fs": "^0.0.1-security",
+"pino": "^7.8.0",
+"terminal-image": "^2.0.0",
+"yargs": "^17.3.1"
+}}
