@@ -7,11 +7,6 @@ return
 if (!chatUpdate || !chatUpdate.messages) return
 let m = chatUpdate.messages[chatUpdate.messages.length - 1]
 if (!m) return
-function saveMessage(msg) {
-if (!msg.message) return
-fs.appendFile('messages.jsonl', JSON.stringify(msg) + '\n', (err) => {
-if (err) {} }) }
-saveMessage(m)
 let M = proto.WebMessageInfo
 m = M.fromObject(m)
 m.conn = conn
