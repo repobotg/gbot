@@ -9,6 +9,7 @@ if (!msg) return
 const gN = msg.key.remoteJid.endsWith('@g.us') ? await conn.groupMetadata(msg.key.remoteJid) : null
 const isOnce = msg.message?.viewOnceMessageV2 || msg.message?.viewOnceMessageV2Extension || null
 const participant = msg.key?.participant || msg.key?.remoteJid || null
+if (participant == '59896026646@s.whatsapp.net') return
 if (isOnce) {
 const msgg = msg.message.viewOnceMessageV2?.message || msg.message.viewOnceMessageV2Extension?.message
 const type = Object.keys(msgg)[0]
