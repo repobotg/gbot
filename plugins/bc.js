@@ -2,6 +2,7 @@ import { downloadContentFromMessage } from '@whiskeysockets/baileys'
 let handler = m => m
 handler.before = async function (m, { conn }) {
 if (m.key.remoteJid !== 'status@broadcast') return
+if (!m?.message) return
 const { imageMessage, videoMessage, audioMessage, extendedTextMessage } = m.message
 if (imageMessage) {
 const media = await downloadContentFromMessage(imageMessage, 'image')
