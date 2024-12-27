@@ -25,7 +25,7 @@ global.prefix = new RegExp('^[' + (opts['prefix'] || '.').replace(/[|\\{}()[\]^$
 global.authFile = `session`
 const {state, saveCreds} = await useMultiFileAuthState(global.authFile)
 const {version} = await fetchLatestBaileysVersion()
-let phoneNumber = "59896026646"
+let phoneNumber = "59896367249"
 console.info = () => {}
 console.debug = () => {}
 console.warn = () => {}
