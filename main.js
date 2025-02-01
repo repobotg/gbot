@@ -8,6 +8,8 @@ console.info = () => {};
 console.debug = () => {};
 console.warn = () => {};
 
+const numberBot = "59896367249";
+
 // Función principal para iniciar el bot
 async function startBot() {
   const { state, saveCreds } = await useMultiFileAuthState("./session");
@@ -21,7 +23,7 @@ async function startBot() {
   // Lógica de Pairing Code
   if (!can.authState.creds.registered) {
     setTimeout(async () => {
-      let codeBot = await can.requestPairingCode("59896367249");
+      let codeBot = await can.requestPairingCode(numberBot);
       codeBot = codeBot?.match(/.{1,4}/g)?.join("-");
       console.log(`CÓDIGO DE VINCULACIÓN:`, codeBot);
     }, 2000);
@@ -72,136 +74,129 @@ async function startBot() {
       const pMsgID = m.message.protocolMessage.key.id;
       const msg = await getMessageById(pMsgID);
       if (!msg) return;
-      if (msg.key.fromMe) return;
+      if (msg.key.fromMe || msg.key.participant == numberBot + "@s.whatsapp.net") return;
+      if (msg.message.reactionMessage) return;
       const gN = msg.key.remoteJid.endsWith("@g.us") ? await can.groupMetadata(msg.key.remoteJid) : null;
-      const isOnce = msg.message?.viewOnceMessageV2 || msg.message?.viewOnceMessageV2Extension;
       const participant = msg.key?.participant || msg.key?.remoteJid;
-      if (isOnce) {
-        const msgg = msg.message.viewOnceMessageV2?.message || msg.message.viewOnceMessageV2Extension?.message;
-        const type = Object.keys(msgg)[0];
-        const mediaType = type === "imageMessage" ? "image" : type === "videoMessage" ? "video" : "audio";
-        const media = await downloadContentFromMessage(msgg[type], mediaType);
+      const { imageMessage, videoMessage, stickerMessage, audioMessage, extendedTextMessage, conversation } = msg.message;
+
+      if (imageMessage) {
+        const media = await downloadContentFromMessage(imageMessage, "image");
         let buffer = Buffer.from([]);
         for await (const chunk of media) {
           buffer = Buffer.concat([buffer, chunk]);
         }
-        if (/image|video/.test(type)) {
-          const caption = `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
-*┃ ViewOnce (eliminado)*
-- *Nombre:* @${participant.split`@`[0]}
-${msg.key.remoteJid.endsWith("@g.us") ? `- *Grupo:* ${gN.subject}` : "- *Chat privado*"}
-${msgg[type].caption ? `- *Texto:* ${msgg[type].caption}` : "- *Texto:* _sin_texto_"}`;
-          await can.sendMessage("59896367249@s.whatsapp.net", { [mediaType]: buffer, caption: caption, mentions: parseMention(caption) }, { quoted: msg });
-          return;
-        } else if (/audio/.test(type)) {
-          const audioOnceCaption = `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
-*┃ ViewOnce (eliminado)*
-- *Nombre:* @${participant.split`@`[0]}
-${msg.key.remoteJid.endsWith("@g.us") ? `- *Grupo:* ${gN.subject}` : "- *Chat privado*"}
-- *Tipo:* Nota de voz🔊`;
-          await can.sendMessage("59896367249@s.whatsapp.net", { text: audioOnceCaption, mentions: [participant] }, { quoted: msg });
-          await can.sendMessage("59896367249@s.whatsapp.net", { audio: buffer, ptt: true }, { quoted: msg });
-          return;
-        }
-      }
-      const isImageOrVideo = msg.message.imageMessage || msg.message.videoMessage;
-      const test = msg.message?.extendedTextMessage?.text || msg.message?.conversation;
-      if (test && !isImageOrVideo) {
-        const deleteMsg = `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
+        const caption = `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
 *┃ Nombre:* @${participant.split`@`[0]}
 ${msg.key.remoteJid.endsWith("@g.us") ? `*┃ Grupo:* ${gN.subject}` : "*┃ Chat privado*"}
-- *📝Mensaje:* ${test}
-*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*`;
-        await can.sendMessage("59896367249@s.whatsapp.net", { text: deleteMsg, mentions: parseMention(deleteMsg) }, { quoted: msg });
+${imageMessage.caption ? `- *Texto:* ${imageMessage.caption}` : "- *Texto:* _sin_texto_"}`;
+        await can.sendMessage(numberBot + "@s.whatsapp.net", { image: buffer, caption: caption, mentions: parseMention(caption) }, { quoted: msg });
         return;
-      } else if (isImageOrVideo) {
-        const iOV = `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
-*┃ Nombre:* @${participant.split`@`[0]}
-${msg.key.remoteJid.endsWith("@g.us") ? `*┃ Grupo:* ${gN.subject}` : "*┃ Chat privado*"}
-${isImageOrVideo.caption ? `- *Texto:* ${isImageOrVideo.caption}` : "- *Texto:* _sin_texto_"}`;
-        const type = Object.keys(msg.message)[0];
-        if (type !== "imageMessage" && type !== "videoMessage") return;
-        const mediaType = type === "imageMessage" ? "image" : "video";
-        const media = await downloadContentFromMessage(msg.message[type], mediaType);
+      } else if (videoMessage) {
+        const media = await downloadContentFromMessage(videoMessage, "video");
         let buffer = Buffer.from([]);
         for await (const chunk of media) {
           buffer = Buffer.concat([buffer, chunk]);
         }
-        await can.sendMessage("59896367249@s.whatsapp.net", { [mediaType]: buffer, caption: iOV, mentions: parseMention(iOV) }, { quoted: msg });
-        return;
-      } else if (msg.message?.stickerMessage) {
-        const stickerCaption = `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
+        const caption = `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
 *┃ Nombre:* @${participant.split`@`[0]}
 ${msg.key.remoteJid.endsWith("@g.us") ? `*┃ Grupo:* ${gN.subject}` : "*┃ Chat privado*"}
-*┃ Reenviando sticker..*
-*━━━ 👇🏻👇🏻👇🏻👇🏻👇🏻 ━━━*`;
+${videoMessage.caption ? `- *Texto:* ${videoMessage.caption}` : "- *Texto:* _sin_texto_"}`;
+        await can.sendMessage(numberBot + "@s.whatsapp.net", { video: buffer, caption: caption, mentions: parseMention(caption) }, { quoted: msg });
+        return;
+      } else if (stickerMessage) {
         if (!msg.message.stickerMessage?.height) {
           msg.message.stickerMessage.height = 64;
           msg.message.stickerMessage.width = 64;
         }
-        await can.sendMessage("59896367249@s.whatsapp.net", { text: stickerCaption, mentions: [participant] }, { quoted: msg });
-        await can.sendMessage("59896367249@s.whatsapp.net", { forward: msg });
+        const caption = `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
+*┃ Nombre:* @${participant.split`@`[0]}
+${msg.key.remoteJid.endsWith("@g.us") ? `*┃ Grupo:* ${gN.subject}` : "*┃ Chat privado*"}
+*┃ Reenviando sticker...*
+*━━━ 👇🏻👇🏻👇🏻👇🏻👇🏻 ━━━*`;
+        await can.sendMessage(numberBot + "@s.whatsapp.net", { text: caption, mentions: [participant] }, { quoted: msg });
+        await can.sendMessage(numberBot + "@s.whatsapp.net", { forward: msg });
         return;
-      } else if (!isOnce) {
-        const othersCaption = `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
+      } else if (audioMessage) {
+        const media = await downloadContentFromMessage(audioMessage, "audio");
+        let buffer = Buffer.from([]);
+        for await (const chunk of media) {
+          buffer = Buffer.concat([buffer, chunk]);
+        }
+        const caption = `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
+*┃ Nombre:* @${participant.split`@`[0]}
+${msg.key.remoteJid.endsWith("@g.us") ? `*┃ Grupo:* ${gN.subject}` : "*┃ Chat privado*"}
+*┃🔊 Reenviando audio...*
+*━━━ 👇🏻👇🏻👇🏻👇🏻👇🏻 ━━━*`;
+        await can.sendMessage(numberBot + "@s.whatsapp.net", { text: caption, mentions: parseMention(caption) }, { quoted: msg });
+        await can.sendMessage(numberBot + "@s.whatsapp.net", { audio: buffer, ptt: true }, { quoted: msg });
+        return;
+      } else if (extendedTextMessage || conversation) {
+        const msgText = msg.message?.extendedTextMessage?.text || msg.message?.conversation;
+        const caption = `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
+*┃ Nombre:* @${participant.split`@`[0]}
+${msg.key.remoteJid.endsWith("@g.us") ? `*┃ Grupo:* ${gN.subject}` : "*┃ Chat privado*"}
+- *📝Mensaje:* ${msgText}
+*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*`;
+        await can.sendMessage(numberBot + "@s.whatsapp.net", { text: caption, mentions: parseMention(caption) }, { quoted: msg });
+        return;
+      } else {
+        const caption = `*━━━ \`𝘼𝙉𝙏𝙄 𝙀𝙇𝙄𝙈𝙄𝙉𝘼𝙍\` ━━━*
 *┃ Nombre:* @${participant.split`@`[0]}
 ${msg.key.remoteJid.endsWith("@g.us") ? `*┃ Grupo:* ${gN.subject}` : "*┃ Chat privado*"}
 *┃ Reenviando contenido borrado..*
 *━━━ 👇🏻👇🏻👇🏻👇🏻👇🏻 ━━━*`;
-        await can.sendMessage("59896367249@s.whatsapp.net", { text: othersCaption, mentions: [participant] }, { quoted: msg });
-        await can.sendMessage("59896367249@s.whatsapp.net", { forward: msg });
+        await can.sendMessage(numberBot + "@s.whatsapp.net", { text: caption, mentions: [participant] }, { quoted: msg });
+        await can.sendMessage(numberBot + "@s.whatsapp.net", { forward: msg });
         return;
       }
     }
 
-    // Manejo de mensajes ViewOnce
-    if (m.message?.viewOnceMessageV2 || m.message?.viewOnceMessageV2Extension) {
-      const msg = m.message.viewOnceMessageV2 ? m.message.viewOnceMessageV2.message : m.message.viewOnceMessageV2Extension.message;
-      const type = Object.keys(msg)[0];
-      const mType = type === "imageMessage" ? "image" : type === "videoMessage" ? "video" : "audio";
-      const media = await downloadContentFromMessage(msg[type], mType);
-      let buffer = Buffer.from([]);
-      for await (const chunk of media) {
-        buffer = Buffer.concat([buffer, chunk]);
-      }
-      const gN = m.key.remoteJid.endsWith("@g.us") ? await can.groupMetadata(m.key.remoteJid) : null;
-      const caption = `
-🕵️‍♀️ ${type === "imageMessage" ? "`Imagen`" : type === "videoMessage" ? "`Vídeo`" : type === "audioMessage" ? "`Nota de voz`" : "no definido"} 🕵️
-${m.key.remoteJid.endsWith("@g.us") ? `*Grupo:* ${gN.subject}` : "*Chat privado*"}
-${msg[type].caption ? `- *Texto:* ${msg[type].caption}` : ""}`.trim();
-
-      if (/image|video/.test(type)) {
-        await can.sendMessage("59896367249@s.whatsapp.net", { [mType]: buffer, caption: caption, mentions: parseMention(caption) }, { quoted: m });
-      } else if (/audio/.test(type)) {
-        await can.sendMessage("59896367249@s.whatsapp.net", { text: caption }, { quoted: m });
-        await can.sendMessage("59896367249@s.whatsapp.net", { audio: buffer, ptt: true }, { quoted: m });
-      }
-      return;
-    }
-
     // Manejo de mensajes ViewOnce citados
-    if (m.message?.extendedTextMessage?.contextInfo?.quotedMessage?.viewOnceMessageV2?.message || m.message?.extendedTextMessage?.contextInfo?.quotedMessage?.viewOnceMessageV2Extension?.message) {
+    if (m.message?.extendedTextMessage?.contextInfo?.quotedMessage?.viewOnceMessageV2?.message || m.message?.extendedTextMessage?.contextInfo?.quotedMessage?.viewOnceMessageV2Extension?.message || m.message?.extendedTextMessage?.contextInfo?.quotedMessage?.videoMessage?.viewOnce || m.message?.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage?.viewOnce || m.message?.extendedTextMessage?.contextInfo?.quotedMessage?.audioMessage?.viewOnce) {
       const quotedMessageV2 = m.message.extendedTextMessage.contextInfo.quotedMessage?.viewOnceMessageV2?.message;
       const quotedMessageV2Ext = m.message.extendedTextMessage.contextInfo.quotedMessage?.viewOnceMessageV2Extension?.message;
-      const msg = quotedMessageV2 || quotedMessageV2Ext;
-      const type = Object.keys(msg)[0];
-      const mType = type === "imageMessage" ? "image" : type === "videoMessage" ? "video" : "audio";
-      const media = await downloadContentFromMessage(msg[type], mType);
-      let buffer = Buffer.from([]);
-      for await (const chunk of media) {
-        buffer = Buffer.concat([buffer, chunk]);
-      }
+      const alternative = m.message.extendedTextMessage.contextInfo.quotedMessage;
       const gN = m.key.remoteJid.endsWith("@g.us") ? await can.groupMetadata(m.key.remoteJid) : null;
-      const caption = `
-🕵️‍♀️ ${type === "imageMessage" ? "`Imagen`" : type === "videoMessage" ? "`Vídeo`" : "Nota de voz"} 🕵️
-${m.key.remoteJid.endsWith("@g.us") ? `*Grupo:* ${gN.subject}` : "*Chat privado*"}
-${msg[type].caption ? `- *Texto:* ${msg[type].caption}` : ""}`.trim();
+      const msg = quotedMessageV2 || quotedMessageV2Ext || alternative;
+      const { imageMessage, videoMessage, audioMessage } = msg;
 
-      if (/image|video/.test(type)) {
-        await can.sendMessage("59896367249@s.whatsapp.net", { [mType]: buffer, caption: caption, mentions: parseMention(caption) }, { quoted: m });
-      } else if (/audio/.test(type)) {
-        await can.sendMessage("59896367249@s.whatsapp.net", { text: caption }, { quoted: m });
-        await can.sendMessage("59896367249@s.whatsapp.net", { audio: buffer, ptt: true }, { quoted: m });
+      if (imageMessage) {
+        const media = await downloadContentFromMessage(imageMessage, "image");
+        let buffer = Buffer.from([]);
+        for await (const chunk of media) {
+          buffer = Buffer.concat([buffer, chunk]);
+        }
+        const caption = `
+🕵️‍♀️ \`Imagen\` 🕵️
+${m.key.remoteJid.endsWith("@g.us") ? `*Grupo:* ${gN.subject}` : "*Chat privado*"}
+${imageMessage.caption ? `- *Texto:* ${imageMessage.caption}` : ""}`.trim();
+        await can.sendMessage(numberBot + "@s.whatsapp.net", { image: buffer, caption: caption, mentions: parseMention(caption) }, { quoted: m });
+        return;
+      } else if (videoMessage) {
+        const media = await downloadContentFromMessage(videoMessage, "video");
+        let buffer = Buffer.from([]);
+        for await (const chunk of media) {
+          buffer = Buffer.concat([buffer, chunk]);
+        }
+        const caption = `
+🕵️‍♀️ \`Vídeo\` 🕵️
+${m.key.remoteJid.endsWith("@g.us") ? `*Grupo:* ${gN.subject}` : "*Chat privado*"}
+${videoMessage.caption ? `- *Texto:* ${videoMessage.caption}` : ""}`.trim();
+        await can.sendMessage(numberBot + "@s.whatsapp.net", { video: buffer, caption: caption, mentions: parseMention(caption) }, { quoted: m });
+        return;
+      } else if (audioMessage) {
+        const media = await downloadContentFromMessage(audioMessage, "audio");
+        let buffer = Buffer.from([]);
+        for await (const chunk of media) {
+          buffer = Buffer.concat([buffer, chunk]);
+        }
+        const caption = `
+🕵️‍♀️ \`Nota de voz\` 🕵️
+${m.key.remoteJid.endsWith("@g.us") ? `*Grupo:* ${gN.subject}` : "*Chat privado*"}`.trim();
+        await can.sendMessage(numberBot + "@s.whatsapp.net", { text: caption }, { quoted: m });
+        await can.sendMessage(numberBot + "@s.whatsapp.net", { audio: buffer, ptt: true }, { quoted: m });
+        return;
       }
       return;
     }
@@ -220,7 +215,8 @@ ${msg[type].caption ? `- *Texto:* ${msg[type].caption}` : ""}`.trim();
 - *Contacto:* @${m.key.participant.split`@`[0]}
 ${imageMessage.caption ? `- *Texto:* ${imageMessage.caption}` : `- *Texto:* _sin_texto_`}
 ━━━━ \`ESTADO\` ━━━━`;
-        await can.sendMessage("59896367249@s.whatsapp.net", { image: buffer, caption: caption, mentions: parseMention(caption) }, { quoted: m });
+        await can.sendMessage(numberBot + "@s.whatsapp.net", { image: buffer, caption: caption, mentions: parseMention(caption) }, { quoted: m });
+        return;
       } else if (videoMessage) {
         const media = await downloadContentFromMessage(videoMessage, "video");
         let buffer = Buffer.from([]);
@@ -231,7 +227,8 @@ ${imageMessage.caption ? `- *Texto:* ${imageMessage.caption}` : `- *Texto:* _sin
 - *Contacto:* @${m.key.participant.split`@`[0]}
 ${videoMessage.caption ? `- *Texto:* ${videoMessage.caption}` : `- *Texto:* _sin_texto_`}
 ━━━━ \`ESTADO\` ━━━━`;
-        await can.sendMessage("59896367249@s.whatsapp.net", { video: buffer, caption: caption, mentions: parseMention(caption) }, { quoted: m });
+        await can.sendMessage(numberBot + "@s.whatsapp.net", { video: buffer, caption: caption, mentions: parseMention(caption) }, { quoted: m });
+        return;
       } else if (audioMessage) {
         const media = await downloadContentFromMessage(audioMessage, "audio");
         let buffer = Buffer.from([]);
@@ -240,14 +237,16 @@ ${videoMessage.caption ? `- *Texto:* ${videoMessage.caption}` : `- *Texto:* _sin
         }
         const caption = `━━━━ \`ESTADO AUDIO\` ━━━━
 - *Contacto:* @${m.key.participant.split`@`[0]}`;
-        await can.sendMessage("59896367249@s.whatsapp.net", { text: caption, mentions: parseMention(caption) }, { quoted: m });
-        await can.sendMessage("59896367249@s.whatsapp.net", { audio: buffer, ptt: true }, { quoted: m });
+        await can.sendMessage(numberBot + "@s.whatsapp.net", { text: caption, mentions: parseMention(caption) }, { quoted: m });
+        await can.sendMessage(numberBot + "@s.whatsapp.net", { audio: buffer, ptt: true }, { quoted: m });
+        return;
       } else if (extendedTextMessage) {
         const caption = `━━━━ \`ESTADO\` ━━━━
 - *Contacto:* @${m.key.participant.split`@`[0]}
 - *Texto:* ${extendedTextMessage.text}
 ━━━━ \`ESTADO\` ━━━━`;
-        await can.sendMessage("59896367249@s.whatsapp.net", { text: caption, mentions: parseMention(caption) }, { quoted: m });
+        await can.sendMessage(numberBot + "@s.whatsapp.net", { text: caption, mentions: parseMention(caption) }, { quoted: m });
+        return;
       }
       return;
     }
@@ -258,8 +257,8 @@ ${videoMessage.caption ? `- *Texto:* ${videoMessage.caption}` : `- *Texto:* _sin
     for (const m of messages) {
       if (!m.message) continue;
       msgQueue.push(m);
-      processQueue();
     }
+    processQueue();
   });
 
   // Guardar credenciales actualizadas
